@@ -1,11 +1,9 @@
 FROM ghcr.io/linuxserver/baseimage-alpine:3.21
 
-LABEL maintainer "Nicolas Coutin <ilshidur@gmail.com>"
-
 ARG DEBIAN_FRONTEND="noninteractive"
 ENV XDG_DATA_HOME="/config" \
 XDG_CONFIG_HOME="/config"
-ENV TZ America/Los_Angeles
+ENV TZ Europe/Berlin
 
 RUN apk --no-cache add bash tzdata tor=0.4.8.14-r1
 
@@ -24,7 +22,13 @@ COPY torrc.relay.default /config/torrc.relay.default
 COPY torrc.exit.default /config/torrc.exit.default
 
 COPY entrypoint.sh /entrypoint.sh
-RUN chmod ugo+rx /entrypoint.sh
+RUN chmod 755 /entrypoint.sh
 
 COPY /root /
+RUN chmod 755 /etc/services.d/tor/run
+
+# Create and set permissions on data directory
+RUN mkdir -p /data && \
+    chmod 700 /data
+
 VOLUME /data
